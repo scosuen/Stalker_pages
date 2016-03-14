@@ -1,0 +1,57 @@
+<html>
+
+<head>
+    <script>
+        function searchInventory() {
+            var urlStr = restAPI_front_URL + "/pivottalbe/inventory/" + Cookies.get('userName') + "/" + Cookies.get('accessToken');
+			
+			$.ajax({
+				type: "GET",
+				url: urlStr,
+				data: null,
+				contentType: "application/json",
+				dataType: "json",
+				async: false ,
+				beforeSend: function() {},
+				success: inventorySuccessFun,
+				failure: function(errMsg) {
+					alert(errMsg);
+				}
+			});
+        }
+		
+		var inventorySuccessFun = function inventorySuccess (data) {
+			if (data.error) {
+				alert("Search data error:" + data.error.message);
+				return;
+			}
+			
+			var htmlStr = "<table class='my_style_table'>";
+			htmlStr = htmlStr + "<tr>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Brand</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Product</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Quantity</th>";
+			htmlStr = htmlStr + "</tr>";
+			$.each(data.inventories, function(i, inventory) {
+				htmlStr = htmlStr + "<tr>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + inventory.brand + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + inventory.product + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + inventory.quantity + "</td>";
+				htmlStr = htmlStr + "</tr>";
+			});
+			htmlStr = htmlStr + "</table>";
+			
+			$("#inventory_result").html(htmlStr);
+		}
+    </script>
+</head>
+
+<body>
+    <br>
+    <h4>Inventory</h4>
+    <button type="button" class="btn btn-primary" onclick="searchInventory()">Search</button>
+    <div id="inventory_result"></div>
+</body>
+
+</html>
+

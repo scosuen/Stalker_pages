@@ -1,0 +1,154 @@
+<html>
+<head>
+<script src="resource/flatui/assets/js/application.js"></script>
+<script>
+	function search() {
+		var urlStr = restAPI_front_URL + "/pivottalbe/itemProfit/" + Cookies.get('userName') + "/" + Cookies.get('accessToken');
+		
+		urlStr = urlStr + "?startDate=" + $("#start_date").val() + "&endDate=" + $("#end_date").val();
+		urlStr = urlStr + "&sortBy=" + $("#sort_by").val();
+		urlStr = urlStr + "&KRW2CNY=" + $("#krw2cny").val() + "&USD2CNY=" + $("#usd2cny").val() + "&CAD2CNY=" + $("#cad2cny").val();
+
+		$.ajax({
+			type: "GET",
+			url: urlStr,
+			data: null,
+			contentType: "application/json",
+			dataType: "json",
+			async: false ,
+			beforeSend: function() {},
+			success: itemProfitSuccessFun,
+			failure: function(errMsg) {
+				alert(errMsg);
+			}
+		});
+	}
+	
+	var itemProfitSuccessFun = function itemProfitSuccess (data) {
+			if (data.error) {
+				alert("Search data error:" + data.error.message);
+				return;
+			}
+			
+			var htmlStr = "<table class='my_style_table'>";
+			htmlStr = htmlStr + "<tr>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Turnover</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Purchased Total</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Gross Profit</th>";
+			htmlStr = htmlStr + "</tr>";
+			htmlStr = htmlStr + "<tr>";
+			htmlStr = htmlStr + "<td class='my_style_thtd'>" + data.grossProfit.turnOver + " " + data.grossProfit.turnOverCurrency + "</td>";
+			htmlStr = htmlStr + "<td class='my_style_thtd'>" + data.grossProfit.purchasedTotal + " " + data.grossProfit.purchasedTotalCurrency + "</td>";
+			htmlStr = htmlStr + "<td class='my_style_thtd'>" + data.grossProfit.grossProfit + " CNY</td>";
+			htmlStr = htmlStr + "</tr>";
+			htmlStr = htmlStr + "</table>";
+			htmlStr = htmlStr + "<br><br>";
+			
+			htmlStr = htmlStr + "<table class='my_style_table'>";
+			htmlStr = htmlStr + "<tr>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Brand</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Product</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Quantity</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd' colspan='2'>Purchased Price<br>min/avg/max</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd' colspan='2'>Sold Price<br>min/avg/max</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Average Profit</th>";
+			htmlStr = htmlStr + "</tr>";
+			$.each(data.itemProfits, function(i, itemProfit) {
+				htmlStr = htmlStr + "<tr>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + itemProfit.brand + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + itemProfit.product + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + itemProfit.quantity + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + itemProfit.finalPriceMin + "<br>" + itemProfit.finalPriceAvg + "<br>" + itemProfit.finalPriceMax + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + itemProfit.finalCurrency + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + itemProfit.soldPriceMin + "<br>" + itemProfit.soldPriceAvg + "<br>" + itemProfit.soldPriceMax + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + itemProfit.soldCurrency + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + itemProfit.averageProfitCNY + " CNY</td>";
+				htmlStr = htmlStr + "</tr>";
+			});
+			
+			htmlStr = htmlStr + "</table>";
+			$("#search_result").html(htmlStr);
+		}
+	
+	var selectedRate = "";
+	function funkrw2cny () {
+		$("#exchange_rate").val($("#krw2cny").val());
+		selectedRate = "krw2cny";
+	}
+	
+	function funusd2cny () {
+		$("#exchange_rate").val($("#usd2cny").val());
+		selectedRate = "usd2cny";
+	}
+	
+	function funcad2cny () {
+		$("#exchange_rate").val($("#cad2cny").val());
+		selectedRate = "cad2cny";
+	}
+	
+	function modifyRate () {
+		if (selectedRate != "") {
+			if ($("#exchange_rate").val() == null || $("#exchange_rate").val() == '') {
+				alert("Please enter a exchange rate.");
+				$("#exchange_rate").focus();
+				return;
+			}
+		}
+			
+		if (selectedRate == 'krw2cny') {
+			$("#krw2cny").val($("#exchange_rate").val());
+		} else if (selectedRate == 'usd2cny') {
+			$("#usd2cny").val($("#exchange_rate").val());
+		} else if (selectedRate == 'cad2cny') {
+			$("#cad2cny").val($("#exchange_rate").val());
+		}
+	}
+		
+</script>
+</head>
+<body>
+<br>
+<h4>Item profit</h4>
+
+<div class="row">
+	<div class="col-lg-2">
+	  <div class="form-group">
+		<input type="text" class="form-control" placeholder="From (yyyy/mm/dd)" id="start_date">
+	  </div>
+	</div>
+	<div class="col-lg-2">
+	  <div class="form-group">
+		<input type="text" class="form-control" placeholder="To (yyyy/mm/dd)" id="end_date">
+	  </div>
+	</div>
+	<select data-toggle="select" class="form-control select select-primary mrs mbm" id="sort_by">
+        <option value="sortByQuantity">Order by quantity</option>
+        <option value="sortByAverageProfit">Order by gross profit</option>
+    </select>
+	
+	<div class="col-lg-3">
+	  <div class="form-group">
+		<div class="input-group">
+		  <div class="input-group-btn">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Rate <span class="caret"></span></button>
+			<ul class="dropdown-menu">
+			  <li><a href="javascript:funkrw2cny()">KRW to CNY</a></li>
+			  <li><a href="javascript:funusd2cny()">USD to CNY</a></li>
+			  <li><a href="javascript:funcad2cny()">CAD to CNY</a></li>
+			</ul>
+		  </div><!-- /btn-group -->
+		  <input type="text" class="form-control" id="exchange_rate" onBlur="modifyRate()">
+		</div><!-- /input-group -->
+	  </div><!-- /.form-group -->
+	</div>
+	
+	<button type="button" class="btn btn-primary" onclick="search()">Search</button>
+</div>
+<input type="hidden" id="krw2cny" value="0.00539">
+<input type="hidden" id="usd2cny" value="6.51740">
+<input type="hidden" id="cad2cny" value="4.88557">
+
+<div id="search_result"></div>
+
+</body>
+</html>

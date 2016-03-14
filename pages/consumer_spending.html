@@ -1,0 +1,70 @@
+<html>
+<head>
+
+<script>
+	function searchCustomers() {
+		var urlStr = restAPI_front_URL + "/pivottalbe/customerSpending/" + Cookies.get('userName') + "/" + Cookies.get('accessToken');
+		
+		urlStr = urlStr + "?startDate=" + $("#start_date").val() + "&endDate=" + $("#end_date").val();
+
+		$.ajax({
+			type: "GET",
+			url: urlStr,
+			data: null,
+			contentType: "application/json",
+			dataType: "json",
+			async: false ,
+			beforeSend: function() {},
+			success: customerSuccessFun,
+			failure: function(errMsg) {
+				alert(errMsg);
+			}
+		});
+	}
+	
+	var customerSuccessFun = function customerSuccess (data) {
+			if (data.error) {
+				alert("Search data error:" + data.error.message);
+				return;
+			}
+			
+			var htmlStr = "<table class='my_style_table'>";
+			htmlStr = htmlStr + "<tr>";
+			htmlStr = htmlStr + "<th class='my_style_thtd'>Customer Name</th>";
+			htmlStr = htmlStr + "<th class='my_style_thtd' colspan='2'>Spending</th>";
+			htmlStr = htmlStr + "</tr>";
+			$.each(data.customerSpendings, function(i, customerSpending) {
+				htmlStr = htmlStr + "<tr>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + customerSpending.customerName + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + customerSpending.spending + "</td>";
+				htmlStr = htmlStr + "<td class='my_style_thtd'>" + customerSpending.spendingCurrency + "</td>";
+				htmlStr = htmlStr + "</tr>";
+			});
+			
+			htmlStr = htmlStr + "</table>";
+			$("#customer_result").html(htmlStr);
+		}
+</script>
+</head>
+<body>
+
+<br>
+<h4>Customer Spending</h4>
+<div class="row">
+	<div class="col-lg-2">
+	  <div class="form-group">
+		<input type="text" class="form-control" placeholder="From (yyyy/mm/dd)" id="start_date">
+	  </div>
+	</div>
+	<div class="col-lg-2">
+	  <div class="form-group">
+		<input type="text" class="form-control" placeholder="To (yyyy/mm/dd)" id="end_date">
+	  </div>
+	</div>
+	<button type="button" class="btn btn-primary" onclick="searchCustomers()">Search</button>
+</div>
+
+<div id="customer_result"></div>
+
+</body>
+</html>

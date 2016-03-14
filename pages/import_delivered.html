@@ -1,0 +1,56 @@
+<html>
+
+<head>
+    <script>
+        function uploadFile() {
+            var urlStr = restAPI_front_URL + "/originalData/importDeliveredOriginalData";
+			
+            var formData = new FormData();
+            formData.append('file', $('#file')[0].files[0]);
+			formData.append('userName', Cookies.get('userName'));
+			formData.append('accessToken', Cookies.get('accessToken'));
+			
+            $.ajax({
+                url: urlStr,
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: successProcessFun,
+                error: function(data) {
+                    alert('Update failed! (error:' + data + ')');
+                }
+            });
+        }
+		
+		var successProcessFun = function successProcess (data) {
+			var json_obj = $.parseJSON(data);
+			if (json_obj.success == 'true')
+				alert("Upload completed.");
+			else 
+				alert('Update failed! (' + json_obj.error.message  + ')');
+		}
+    </script>
+</head>
+
+<body>
+    <br>
+    <h4>Import DELIVERED original data</h4>
+    <br>
+    <form id="uploadForm" enctype="multipart/form-data" method="post">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="file" class="form-control" id="file">
+                    <span class="input-group-btn">
+					<button class="btn btn-default" type="button" onclick="uploadFile()">Upload</button>
+				  </span>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+
+</html>

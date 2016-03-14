@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="resource/flatui/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="resource/flatui/css/flat-ui.min.css" rel="stylesheet">
+	
+    <script src="resource/flatui/js/vendor/jquery.min.js"></script>
+    <script src="resource/flatui/js/flat-ui.min.js"></script>
+	<script src="resource/flatui/assets/js/application.js"></script>
+	<script src="resource/js.cookie.js"></script>
+	<script src="resource/common_js.js"></script>
+	<script src="resource/pikaday.js"></script>
+	
+	<link href="resource/my_style.css" rel="stylesheet" type="text/css" />
+    <script>
+        $(function() {
+			$("#a_company_name").text(Cookies.get('companyName'));
+			$("#a_user_name").text(Cookies.get('userName'));
+        });
+		
+		function openImportPurchasedPage() {
+			$("#sub_page").load("import_purchased.html");
+		}
+		
+		function openImportDeliveredPage() {
+			$("#sub_page").load("import_delivered.html");
+		}
+		
+		function openImportTemplatePage() {
+			$("#sub_page").load("excel_template.html");
+		}
+		
+		function openInventory() {
+			$("#sub_page").load("inventory.html");
+		}
+		
+		function openConsumerSpending() {
+			$("#sub_page").load("consumer_spending.html");
+		}
+		
+		function openItemProfit() {
+			$("#sub_page").load("item_profit.html");
+		}
+		
+		function logout() {
+			var urlStr = restAPI_front_URL + "/user/logout/" + Cookies.get('userName') + "/" + Cookies.get('accessToken');
+			$.ajax({
+				type: "GET",
+				url: urlStr,
+				data: null,
+				contentType: "application/json",
+				dataType: "json",
+				async: false ,
+				beforeSend: function() {},
+				success: successProcessFun,
+				failure: function(errMsg) {
+					alert(errMsg);
+				}
+			});
+		}
+		
+		var successProcessFun = function successProcess (data) {
+			if (data.success == 'true') {
+				Cookies.remove('accessToken');
+				Cookies.remove('userName');
+				Cookies.remove('companyName');
+				window.location.href='login.html';
+				return;
+			} else {
+				alert("Log out failed. error:" + data.error.message);
+			}
+		}
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-inverse navbar-lg" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-7">
+                    <span class="sr-only">Navigation</span>
+                </button>
+                <a class="navbar-brand" href="#" id="a_company_name"></a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="navbar-collapse-7">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Bookkeeping<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:openImportPurchasedPage();">Import purchased</a></li>
+                            <li><a href="javascript:openImportDeliveredPage();">Import delivered</a></li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:openImportTemplatePage();">Excel template</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">PivotTable<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:openInventory()">Inventory</a></li>
+                            <li><a href="javascript:openConsumerSpending()">Consumer spending</a></li>
+							<li><a href="javascript:openItemProfit()">Item profit</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-left" action="#" role="search">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" id="navbarInput-01" type="search" placeholder="Search">
+                            <span class="input-group-btn">
+								<button type="submit" class="btn"><span class="fui-search"></span></button>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="a_user_name"><b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Change password</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:logout()">Logout</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+
+        <!-- sub page-->
+        <div id="sub_page"></div>
+        <!-- end sub page-->
+    </div>
+</body>
+
+</html>
