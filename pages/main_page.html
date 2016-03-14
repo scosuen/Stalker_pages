@@ -56,22 +56,23 @@
 				dataType: "json",
 				async: false ,
 				beforeSend: function() {},
-				success: successProcessFun,
+				success: logoutSuccessFun,
 				failure: function(errMsg) {
 					alert(errMsg);
+					window.location.href='login.html';
 				}
 			});
 		}
 		
-		var successProcessFun = function successProcess (data) {
+		var logoutSuccessFun = function logoutSuccess (data) {
 			if (data.success == 'true') {
 				Cookies.remove('accessToken');
 				Cookies.remove('userName');
 				Cookies.remove('companyName');
 				window.location.href='login.html';
-				return;
 			} else {
 				alert("Log out failed. error:" + data.error.message);
+				window.location.href='login.html';
 			}
 		}
     </script>
